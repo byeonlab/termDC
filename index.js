@@ -86,14 +86,18 @@ const promptPostDetail = (url, galleryID, galleryPage) => {
           name: "menu",
           message: content + "\n",
           choices: [
-            "return"
+            "return",
+            "exit"
           ],
         },
       ])
       .then(answers => {
         // console.log(answers.menu)
-        if (true || answers.menu == "a") { //debug 필요
+        if (answers.menu == "return") { //debug 필요
           promptPostList(galleryID, galleryPage);
+        }
+        if (answers.menu == "return") { //debug 필요
+          return 0;
         }
       });
     })
