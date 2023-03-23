@@ -72,11 +72,11 @@ const promptPostDetail = (url, galleryID, galleryPage) => {
     .then(html => {
       const $ = cheerio.load(html.data);
       const $write_div = $("div.write_div");
-      content = $write_div.text();
-      // content = ""
-      // $write_div.find("p").each(function (index, element) {
-      //   content += $(this).text() + "\n";
-      // });
+      // content = $write_div.text();
+      content = ""
+      $write_div.children().each(function (index, element) {
+        content += $(this).text() + "\n";
+      });
       return content;
     })
     .then(content => {
