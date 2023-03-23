@@ -70,7 +70,9 @@ getPageHtml(buildTargetUrl(urlPrefix, galleryID, galleryPage))
       getPageHtml(answers.post.url)
       .then(html => {
         const $ = cheerio.load(html.data);
-        const $ps = $("div.write_div p");
+        const $write_div = $("div.write_div");
+        const $ps = $write_div.find("p");
+
 
         $ps.each(function (index, element) {
           console.log($(this).text());
