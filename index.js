@@ -64,18 +64,22 @@ const promptPostList = (galleryID, galleryPage) => {
       ])
       .then(answers => {
         console.clear();
-        promptPostDetail(answers.post.url, galleryID, galleryPage);
+        promptPostDetail(answers.post, galleryID, galleryPage);
       });
     });
 };
 
-const promptPostDetail = (url, galleryID, galleryPage) => {
-  getPageHtml(url)
+const promptPostDetail = (post, galleryID, galleryPage) => {
+  getPageHtml(post.url)
     .then(html => {
       const $ = cheerio.load(html.data);
       const $write_div = $("div.write_div");
       // content = $write_div.text();
-      content = ""
+      content = "\n";
+      content += post.title + "\n"
+      content += post.date + "\n"
+      content += post.writerNick + "\n"
+      content += "---------------------------------------------------------------------------------\n"
       $write_div.children().each(function (index, element) {
         content += $(this).text() + "\n";
       });
