@@ -7,14 +7,6 @@ const headers = {
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15",
 };
 
-const galleryUrl = (urlPrefix, galleryID, galleryPage) => {
-  return urlPrefix + galleryID + "&page=" + galleryPage;
-};
-
-const urlPrefix = "https://gall.dcinside.com/board/lists?id=";
-const galleryID = "programming";
-const galleryPage = "1";
-
 const getPageHtml = async (url) => {
   try {
     return await axios.get(url, {
@@ -56,8 +48,8 @@ const parsePosts = (html) => {
   return posts;
 };
 
-const promptPostList = (url) => {
-  getPageHtml(url)
+const promptPostList = (galleryID, galleryPage) => {
+  getPageHtml("https://gall.dcinside.com/board/lists?id=" + galleryID + "&page=" + galleryPage)
     .then((html) => parsePosts(html))
     .then((posts) => {
       inquirer.prompt([
@@ -70,12 +62,12 @@ const promptPostList = (url) => {
         },
       ])
       .then(answers => {
-        promptPostDetail(answers.post.url);
+        promptPostDetail(answers.post.url, galleryID, galleryPage);
       });
     });
 };
 
-const promptPostDetail = (url) => {
+const promptPostDetail = (url, galleryID, galleryPage) => {
   getPageHtml(url)
     .then(html => {
       const $ = cheerio.load(html.data);
@@ -101,11 +93,16 @@ const promptPostDetail = (url) => {
       .then(answers => {
         // console.log(answers.menu)
         if (true || answers.menu == "a") { //debug 필요
-          promptPostList(galleryUrl(urlPrefix, galleryID, galleryPage));
+          promptPostList(galleryID, galleryPage);
         }
       });
     })
 }
 
 
-promptPostList(galleryUrl(urlPrefix, galleryID, galleryPage));
+
+
+const galleryID = "programming";
+const galleryPage = "1";
+
+promptPostList(galleryID, galleryPage);
