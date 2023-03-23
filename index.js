@@ -62,6 +62,7 @@ const promptPostList = (url) => {
     .then((posts) => {
       inquirer.prompt([
         {
+          pageSize: 50,
           type: "list",
           name: "post",
           message: "gallery",
@@ -87,17 +88,21 @@ const promptPostDetail = (url) => {
       return content;
     })
     .then(content => {
-      // console.log(content);
       inquirer.prompt([
         {
           type: "list",
           name: "menu",
-          message: content,
-          choices: ["[OK]"],
+          message: content + "\n",
+          choices: [
+            "return"
+          ],
         },
       ])
       .then(answers => {
-        promptPostList(galleryUrl(urlPrefix, galleryID, galleryPage));
+        // console.log(answers.menu)
+        if (true || answers.menu == "a") { //debug 필요
+          promptPostList(galleryUrl(urlPrefix, galleryID, galleryPage));
+        }
       });
     })
 }
