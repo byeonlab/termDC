@@ -76,9 +76,13 @@ const promptPostDetail = (post, galleryID, galleryPage) => {
       const $write_div = $("div.write_div");
       // content = $write_div.text();
       content = "\n";
-      content += post.title + "\n"
-      content += post.date + "\n"
-      content += post.writerNick + "\n"
+      content += post.title + "\n";
+      content += post.date + "\n";
+      content += post.writerNick;
+      if (post.writerIP != "") {
+        content += "(" + post.writerIP + ")";
+      }
+      content += "\n";
       content += "---------------------------------------------------------------------------------\n"
       $write_div.children().each(function (index, element) {
         content += $(this).text() + "\n";
