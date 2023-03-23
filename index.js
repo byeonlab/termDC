@@ -60,8 +60,10 @@ const promptPostList = (galleryID, galleryPage) => {
           message: "gallery",
           choices: posts,
         },
+
       ])
       .then(answers => {
+        console.clear();
         promptPostDetail(answers.post.url, galleryID, galleryPage);
       });
     });
@@ -94,9 +96,11 @@ const promptPostDetail = (url, galleryID, galleryPage) => {
       .then(answers => {
         // console.log(answers.menu)
         if (answers.menu == "return") { //debug 필요
+          console.clear();
           promptPostList(galleryID, galleryPage);
         }
-        if (answers.menu == "return") { //debug 필요
+        if (answers.menu == "exit") { //debug 필요
+          console.clear();
           return 0;
         }
       });
