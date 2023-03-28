@@ -1,0 +1,12 @@
+CommentAreaWidget {
+    /* background: lightblue;
+    color: white; */
+    border-top: solid green;
+}
+
+PostHeaderWidget {
+    /* background: lightblue;
+    color: white; */
+    border-bottom: solid green;
+}
+
