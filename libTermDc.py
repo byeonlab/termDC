@@ -1,9 +1,9 @@
-from textual.app import App, ComposeResult
+from textual.app import App, ComposeResult, Widget
 # from textual.containers import Grid
 from textual.widgets import Header, Footer, DataTable, Static
 from textual.screen import Screen
 
-import libDc
+from DCsdk import libDc
 
 class GalleryList(DataTable):
     def __init__(self):
@@ -30,30 +30,80 @@ class PostBodyWidget(Static):
     def on_mount(self) -> None:
         self.update(self.content)
 
-class CommentAreaWidget(Static):
+class commentListHeaderStatic(Static):
     def __init__(self, content):
         Static.__init__(self)
-        self.content = content
+        self.content = str(content)
 
     def on_mount(self) -> None:
         self.update(self.content)
+
+class commentWriterStatic(Static):
+    def __init__(self, content):
+        Static.__init__(self)
+        self.content = str(content)
+
+    def on_mount(self) -> None:
+        self.update(self.content)
+
+class commentMemoStatic(Static):
+    def __init__(self, content):
+        Static.__init__(self)
+        self.content = str(content)
+
+    def on_mount(self) -> None:
+        self.update(self.content)
+
+class commentDateStatic(Static):
+    def __init__(self, content):
+        Static.__init__(self)
+        self.content = str(content)
+
+    def on_mount(self) -> None:
+        self.update(self.content)
+
+class CommentItemStatic(Static):
+    def __init__(self, commentObject):
+        Static.__init__(self)
+        self.commentObject = commentObject
+
+    def compose(self) -> ComposeResult:
+        yield commentWriterStatic(self.commentObject["name"])
+        yield commentMemoStatic(self.commentObject["memo"])
+        yield commentDateStatic(self.commentObject["reg_date"])
+
+class CommentListWidget(Widget):
+    def __init__(self, CommentObjects: dict):
+        Widget.__init__(self)
+        self.commentObjects = CommentObjects
+
+    def compose(self) -> ComposeResult:
+        # render
+        for commentObject in self.commentObjects:
+            # yield commentWriterStatic(commentObject["name"])
+            # yield commentMemoStatic(commentObject["memo"])
+            # yield commentDateStatic(commentObject["reg_date"])
+            yield CommentItemStatic(commentObject)
+            # yield Static(str(commentObject))
+
 
 class PostReadScreen(Screen):
     BINDINGS = [
         ("q", "quit_post_read", "Quit"),
         # ("r", "refresh", "Refresh")
-        ]
+    ]
 
     def __init__(self, galleryId, postNo):
         Screen.__init__(self)
         self.postNo = postNo 
         self.galleryId = galleryId
         self.postResponse = libDc.GetPost(galleryId, postNo)
+        self.comments = libDc.GetComment(self.postResponse.text)
 
     def compose(self) -> ComposeResult:
         yield PostHeaderWidget(libDc.ParsePostHeader(self.postResponse.text))
         yield PostBodyWidget(libDc.ParsePostBody(self.postResponse.text))
-        yield CommentAreaWidget(libDc.GetComment(self.postResponse.text))
+        yield CommentListWidget(self.comments)
         yield Footer()
 
     def action_quit_post_read(self) -> None:
@@ -96,7 +146,7 @@ class PostListScreen(Screen):
     
 
 class termDC(App):
-    CSS_PATH = "CommentArea.css"
+    CSS_PATH = "termDC.css"
     def compose(self) -> ComposeResult:
         yield Header()
         yield GalleryList()

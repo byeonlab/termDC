@@ -1,0 +1,17 @@
+PostHeaderWidget {
+    /* background: lightblue;
+    color: white; */
+    border-bottom: solid green;
+}
+
+PostBodyWidget {
+    /* background: lightblue;
+    color: white; */
+    border-bottom: solid green;
+}
+
+CommentItemStatic {
+    /* background: lightblue;
+    color: white; */
+    border-bottom: solid lightblue;
+}
