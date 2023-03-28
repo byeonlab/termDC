@@ -114,17 +114,10 @@ def GetComment(html):
         "e_s_n_o": e_s_n_o,
         "_GALLTYPE_": "G"
     }
-    
-    comments = []
+
     resp = requests.post(url, data=data, headers=cmt_headers)
 
-    commentsJson= resp.json()["comments"]
+    if resp.json()["comments"] != None: 
+        return resp.json()["comments"]
 
-    for comment in commentsJson:
-        if comment["name"] == "댓글돌이":
-            # comments += "댓굴돌이: [생략]\n"
-            continue
-
-        comments += comment["name"] + ": " + comment["memo"] + "\n"
-
-    return resp.json()["comments"]
+    return []

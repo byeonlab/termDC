@@ -11,7 +11,7 @@ class GalleryList(DataTable):
         self.cursor_type = "row"
         self.add_columns("Gallery")
         self.add_row("프로그래밍 갤러리", key="programming")
-        self.add_row("국내야구 갤러리", key="baseball_new11")
+        self.add_row("식물 갤러리", key="tree")
         self.focus()
 
 class PostHeaderWidget(Static):
@@ -80,12 +80,7 @@ class CommentListWidget(Widget):
     def compose(self) -> ComposeResult:
         # render
         for commentObject in self.commentObjects:
-            # yield commentWriterStatic(commentObject["name"])
-            # yield commentMemoStatic(commentObject["memo"])
-            # yield commentDateStatic(commentObject["reg_date"])
             yield CommentItemStatic(commentObject)
-            # yield Static(str(commentObject))
-
 
 class PostReadScreen(Screen):
     BINDINGS = [
@@ -103,7 +98,8 @@ class PostReadScreen(Screen):
     def compose(self) -> ComposeResult:
         yield PostHeaderWidget(libDc.ParsePostHeader(self.postResponse.text))
         yield PostBodyWidget(libDc.ParsePostBody(self.postResponse.text))
-        yield CommentListWidget(self.comments)
+        if self.comments != []:
+            yield CommentListWidget(self.comments)
         yield Footer()
 
     def action_quit_post_read(self) -> None:
