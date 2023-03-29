@@ -98,7 +98,7 @@ class PostReadScreen(Screen):
     def compose(self) -> ComposeResult:
         yield PostHeaderWidget(libDc.ParsePostHeader(self.postResponse.text))
         yield PostBodyWidget(libDc.ParsePostBody(self.postResponse.text))
-        if self.comments != []:
+        if self.comments != None:
             yield CommentListWidget(self.comments)
         yield Footer()
 

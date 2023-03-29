@@ -117,7 +117,4 @@ def GetComment(html):
 
     resp = requests.post(url, data=data, headers=cmt_headers)
 
-    if resp.json()["comments"] != None: 
-        return resp.json()["comments"]
-
-    return []
+    return resp.json()["comments"]
