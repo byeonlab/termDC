@@ -38,6 +38,10 @@ CommentDateStatic {
     color: lightblue;
 }
 
+CommentAreaHeaderStatic {
+    color: orange;
+}
+
 CommentAreaWidget {
     /* height: 25; */
     /* background: midnightblue; */

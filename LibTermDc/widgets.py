@@ -43,7 +43,7 @@ class PostBodyWidget(Static):
     pass
 
 ## Comments ###
-class commentAreaHeaderStatic(Static):
+class CommentAreaHeaderStatic(Static):
     pass
 
 class CommentWriterStatic(Static):
@@ -72,7 +72,7 @@ class CommentAreaWidget(Widget):
 
     def compose(self) -> ComposeResult:
         # render
-        yield commentAreaHeaderStatic(self.commentData["header"])
+        yield CommentAreaHeaderStatic(self.commentData["header"])
         if self.commentData["comments"] is not []:
             for comment in self.commentData["comments"]:
                 yield CommentItemStatic(comment)
