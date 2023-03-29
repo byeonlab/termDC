@@ -73,6 +73,5 @@ class CommentAreaWidget(Widget):
     def compose(self) -> ComposeResult:
         # render
         yield CommentAreaHeaderStatic(self.commentData["header"])
-        if self.commentData["comments"] is not []:
-            for comment in self.commentData["comments"]:
-                yield CommentItemStatic(comment)
+        for comment in self.commentData["comments"]:
+            yield CommentItemStatic(comment)
