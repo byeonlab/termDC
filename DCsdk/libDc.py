@@ -8,12 +8,9 @@ headers = {
 def getPosts(galleryId):
     url = "https://gall.dcinside.com/board/lists?id=" + galleryId
 
-
     response = requests.get(url, headers=headers)
     soup = bs4.BeautifulSoup(response.text, "html.parser")
-
     trs = soup.find_all("tr", {"class": "ub-content us-post"})
-
 
     posts = []
 
@@ -36,11 +33,6 @@ def getPosts(galleryId):
     
     return posts
 
-        # print(date)
-        # print(writerNick)
-        # print(title)
-        # print()
-
 def GetPost(galleryId, num):
     url = "https://gall.dcinside.com/board/view/?id=" + galleryId + "&no=" + num
     response = requests.get(url, headers=headers)
@@ -56,16 +48,18 @@ def ParsePostHeader(html):
     date = content.find("span", {"class": "gall_date"}).text
 
     writerData = content.find("div", {"class": "gall_writer ub-writer"})
-    nickname = writerData["data-nick"]
+    nick = writerData["data-nick"]
     ip = writerData["data-ip"]
     uid = writerData["data-uid"]
 
-    PostHeader = ""
-    PostHeader += title + "\n"
-    PostHeader += nickname + "\n"
-    PostHeader += date + "\n"
+    data = {} 
+    data["title"] = title
+    data["nick"] = nick
+    if ip != "":
+        data["nick"] += "(%s)" % ip
+    data["date"] = date
 
-    return PostHeader
+    return data
 
 def ParsePostBody(html):
     soup = bs4.BeautifulSoup(html, "html.parser")
@@ -115,6 +109,20 @@ def GetComment(html):
         "_GALLTYPE_": "G"
     }
 
-    resp = requests.post(url, data=data, headers=cmt_headers)
+    raw = requests.post(url, data=data, headers=cmt_headers).json()
+    data = {
+        "comments": []
+    }
 
-    return resp.json()["comments"]
+    if raw["comments"] != None:
+        for e in raw["comments"]:
+            comment = {}
+            comment["memo"] = e["memo"]
+            comment["reg_date"] = e["reg_date"]
+            comment["name"] = e["name"]
+            if e["nicktype"] == "00":
+                comment["name"] += "(" + e["ip"] + ")"
+            
+            data["comments"].append(comment)
+
+    return data

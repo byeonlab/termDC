@@ -1,17 +1,44 @@
+PostTitleStatic {
+    text-style: bold;
+    color: cyan;
+}
+
+PostWriterStatic {
+    color: yellow;
+}
+
+PostDateStatic {
+    color: lightblue;
+}
+
 PostHeaderWidget {
-    /* background: lightblue;
-    color: white; */
-    border-bottom: solid green;
+    background:#3f3e3d;
+    height: 5;
+    margin: 0;
+    padding: 0;
 }
 
 PostBodyWidget {
-    /* background: lightblue;
-    color: white; */
-    border-bottom: solid green;
+    background: midnightblue;
+    color: beige;
+    /* background: wheat; */
+    /* border-bottom: solid wheat; */
 }
 
 CommentItemStatic {
-    /* background: lightblue;
-    color: white; */
-    border-bottom: solid lightblue;
+    background:#3f3e3d;
+    border-bottom: solid lightslategray;
+}
+
+CommentWriterStatic {
+    color: yellow;
+}
+
+CommentDateStatic {
+    color: lightblue;
+}
+
+CommentAreaWidget {
+    /* height: 25; */
+    /* background: midnightblue; */
 }
