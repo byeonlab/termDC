@@ -42,9 +42,9 @@ class PostHeaderWidget(Widget):
 class PostBodyWidget(Static):
     pass
 
-### Comments ###
-# class commentListHeaderStatic(Static):
-#     pass
+## Comments ###
+class commentAreaHeaderStatic(Static):
+    pass
 
 class CommentWriterStatic(Static):
     pass
@@ -66,11 +66,13 @@ class CommentItemStatic(Static):
         yield CommentDateStatic(self.commentObject["reg_date"])
 
 class CommentAreaWidget(Widget):
-    def __init__(self, CommentObjects):
+    def __init__(self, commentData):
         Widget.__init__(self)
-        self.commentObjects = CommentObjects
+        self.commentData = commentData
 
     def compose(self) -> ComposeResult:
         # render
-        for commentObject in self.commentObjects:
-            yield CommentItemStatic(commentObject)
+        yield commentAreaHeaderStatic(self.commentData["header"])
+        if self.commentData["comments"] is not []:
+            for comment in self.commentData["comments"]:
+                yield CommentItemStatic(comment)

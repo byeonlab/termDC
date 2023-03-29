@@ -20,8 +20,7 @@ class PostReadScreen(Screen):
     def compose(self) -> ComposeResult:
         yield PostHeaderWidget(libDc.ParsePostHeader(self.html))
         yield PostBodyWidget(libDc.ParsePostBody(self.html))
-        if self.commentData["comments"] != []:
-            yield CommentAreaWidget(self.commentData["comments"])
+        yield CommentAreaWidget(self.commentData)
         yield Footer()
 
     def action_quit_post_read(self) -> None:

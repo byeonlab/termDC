@@ -111,8 +111,11 @@ def GetComment(html):
 
     raw = requests.post(url, data=data, headers=cmt_headers).json()
     data = {
+        "header": "",
         "comments": []
     }
+
+    data["header"] = "댓글 수: %s" % raw["total_cnt"]
 
     if raw["comments"] != None:
         for e in raw["comments"]:
