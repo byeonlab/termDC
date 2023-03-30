@@ -1,3 +1,6 @@
+import pkg_resources
+pkg_resources.require("textual==0.17.0")
+
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer
 from textual.screen import Screen
