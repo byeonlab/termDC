@@ -13,7 +13,7 @@ class PostList(DataTable):
     def __init__(self):
         DataTable.__init__(self)
         self.cursor_type = "row"
-        self.add_columns("No", "Writer", "Title")
+        self.add_columns("No", "Writer", "Title", "Date")
     
 ### PostRead###
 class PostTitleStatic(Static):

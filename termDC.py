@@ -28,11 +28,16 @@ class PostReadScreen(Screen):
         self.compose()
         
 class PostListScreen(Screen):
-    BINDINGS = [("q", "quit_post_list", "Quit")]
+    BINDINGS = [
+        ("q", "quit_post_list", "Quit"),
+        ("n", "next_page", "Next Page"),
+        ("p", "prev_page", "Previous Page"),
+    ]
 
     def __init__(self, galleryId):
         Screen.__init__(self)
         self.galleryId = galleryId 
+        self.pageNo = 1
 
     def compose(self) -> ComposeResult:
         yield PostList()
@@ -40,19 +45,35 @@ class PostListScreen(Screen):
 
     def on_mount(self) -> None:
         table = self.query_one(PostList)
-        rows = iter(libDc.getPosts(self.galleryId))
+        rows = iter(libDc.getPosts(self.galleryId, self.pageNo) )
 
         table.add_rows(rows)
         table.focus()
-
-    def action_quit_post_list(self) -> None:
-        self.app.pop_screen()
 
     def on_data_table_row_selected(self, event) -> None:
         table = self.query_one(PostList)
         postNo = table.get_row_at(event.cursor_row)[0]
         self.app.push_screen(PostReadScreen(self.galleryId, postNo))
-    
+
+    def action_quit_post_list(self) -> None:
+        self.app.pop_screen()
+
+    def action_next_page(self) -> None:
+        self.pageNo += 1
+        rows = iter(libDc.getPosts(self.galleryId, self.pageNo))
+        table = self.query_one(PostList)
+        table.clear()
+        table.add_rows(rows)
+
+    def action_prev_page(self) -> None:
+        if self.pageNo == 1:
+            return None
+
+        self.pageNo -= 1
+        rows = iter(libDc.getPosts(self.galleryId, self.pageNo))
+        table = self.query_one(PostList)
+        table.clear()
+        table.add_rows(rows)
 
 class termDC(App):
     CSS_PATH = "termDC.css"

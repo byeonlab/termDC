@@ -43,7 +43,7 @@ CommentAreaHeaderStatic {
 }
 
 CommentAreaWidget {
-    height: 30;
+    height: 40;
     overflow-y: auto;
     /* height: 25; */
     /* background: midnightblue; */

@@ -5,8 +5,11 @@ headers = {
     "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15"
 }
 
-def getPosts(galleryId):
-    url = "https://gall.dcinside.com/board/lists?id=" + galleryId
+def getPosts(galleryId, pageNo):
+    if type(pageNo) is not int:
+        raise TypeError("pageNo must be an integer")
+
+    url = "https://gall.dcinside.com/board/lists?id=" + galleryId + "&page=" + str(pageNo)
 
     response = requests.get(url, headers=headers)
     soup = bs4.BeautifulSoup(response.text, "html.parser")
@@ -29,7 +32,7 @@ def getPosts(galleryId):
             writer += "(%s)" % writerIP
         date = tr.find("td", {"class": "gall_date"}).text
 
-        posts.append((num, writer, title))
+        posts.append((num, writer, title, date))
     
     return posts
 
