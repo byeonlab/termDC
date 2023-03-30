@@ -75,8 +75,7 @@ class PostListScreen(Screen):
         table.clear()
         table.add_rows(rows)
 
-class termDC(App):
-    CSS_PATH = "termDC.css"
+class IndexScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         yield GalleryList()
@@ -86,7 +85,14 @@ class termDC(App):
         table.add_row("프로그래밍 갤러리", key="programming")
         table.add_row("식물 갤러리", key="tree")
         table.focus()
-    
+
     def on_data_table_row_selected(self, event) -> None:
         GalleryId = event.row_key.value
         self.app.push_screen(PostListScreen(GalleryId))
+
+class termDC(App):
+    CSS_PATH = "termDC.css"
+
+    def on_mount(self) -> None:
+        self.push_screen(IndexScreen())
+
