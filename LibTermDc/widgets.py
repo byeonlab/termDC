@@ -2,6 +2,8 @@ from textual.widgets import Static, DataTable
 from textual.app import ComposeResult, Widget
 
 ### Gallery List ###
+
+
 class GalleryList(DataTable):
     def __init__(self):
         DataTable.__init__(self)
@@ -9,21 +11,28 @@ class GalleryList(DataTable):
         self.add_columns("Gallery")
 
 ## PostList ###
+
+
 class PostList(DataTable):
     def __init__(self):
         DataTable.__init__(self)
         self.cursor_type = "row"
         self.add_columns("No", "Writer", "Title", "Date")
-    
+
 ### PostRead###
+
+
 class PostTitleStatic(Static):
     pass
+
 
 class PostWriterStatic(Static):
     pass
 
+
 class PostDateStatic(Static):
     pass
+
 
 class PostHeaderWidget(Widget):
     def __init__(self, PostHeaderData):
@@ -43,17 +52,23 @@ class PostBodyWidget(Static):
     pass
 
 ## Comments ###
+
+
 class CommentAreaHeaderStatic(Static):
     pass
+
 
 class CommentWriterStatic(Static):
     pass
 
+
 class CommentMemoStatic(Static):
     pass
 
+
 class CommentDateStatic(Static):
     pass
+
 
 class CommentItemStatic(Static):
     def __init__(self, commentObject):
@@ -64,6 +79,21 @@ class CommentItemStatic(Static):
         yield CommentWriterStatic(self.commentObject["name"])
         yield CommentMemoStatic(self.commentObject["memo"])
         yield CommentDateStatic(self.commentObject["reg_date"])
+        yield SubCommentItemStatic(self.commentObject["subcomments"])
+
+
+class SubCommentItemStatic(Static):
+    def __init__(self, subCommentObject):
+        Static.__init__(self)
+        self.subCommentObject = subCommentObject
+
+    # raise Exception("**", self.commentObject)
+    def compose(self) -> ComposeResult:
+        for e in self.subCommentObject:
+            yield CommentWriterStatic("  ┗ " + e["name"])
+            yield CommentMemoStatic("    " + e["memo"])
+            yield CommentDateStatic("    " + e["reg_date"])
+
 
 class CommentAreaWidget(Widget):
     def __init__(self, commentData):
@@ -73,5 +103,5 @@ class CommentAreaWidget(Widget):
     def compose(self) -> ComposeResult:
         # render
         yield CommentAreaHeaderStatic(self.commentData["header"])
-        for comment in self.commentData["comments"]:
+        for comment in self.commentData["comments"].values():
             yield CommentItemStatic(comment)
