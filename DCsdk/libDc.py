@@ -142,7 +142,7 @@ def GetComment(html):
             depth = int(e["depth"])
             if depth == 0:
                 comment["subcomments"] = []
-                data["comments"] = {comment["no"]: comment}
+                data["comments"].update({comment["no"]: comment})
             else:
                 parents = data["comments"].get(e["c_no"], "0")
                 parents["subcomments"].append(comment)
