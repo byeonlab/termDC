@@ -35,6 +35,7 @@ class PostListScreen(Screen):
         ("q", "quit_post_list", "Quit"),
         ("n", "next_page", "Next Page"),
         ("p", "prev_page", "Previous Page"),
+        ("r", "refresh", "Refresh"),
     ]
 
     def __init__(self, galleryId):
@@ -63,20 +64,23 @@ class PostListScreen(Screen):
 
     def action_next_page(self) -> None:
         self.pageNo += 1
-        rows = iter(libDc.getPosts(self.galleryId, self.pageNo))
-        table = self.query_one(PostList)
-        table.clear()
-        table.add_rows(rows)
+        self.populate_list()
 
     def action_prev_page(self) -> None:
         if self.pageNo == 1:
             return None
 
         self.pageNo -= 1
+        self.populate_list()
+
+    def action_refresh(self) -> None:
+        self.populate_list()
+
+    def populate_list(self):
         rows = iter(libDc.getPosts(self.galleryId, self.pageNo))
         table = self.query_one(PostList)
         table.clear()
-        table.add_rows(rows)
+        table.add_rows(rows)        
 
 class IndexScreen(Screen):
     def compose(self) -> ComposeResult:
