@@ -1,15 +1,19 @@
+from collections import OrderedDict
+
 import requests
 import bs4
 
 headers = {
-    "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15"
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15"
 }
+
 
 def getPosts(galleryId, pageNo):
     if type(pageNo) is not int:
         raise TypeError("pageNo must be an integer")
 
-    url = "https://gall.dcinside.com/board/lists?id=" + galleryId + "&page=" + str(pageNo)
+    url = "https://gall.dcinside.com/board/lists?id=" + \
+        galleryId + "&page=" + str(pageNo)
 
     response = requests.get(url, headers=headers)
     soup = bs4.BeautifulSoup(response.text, "html.parser")
@@ -33,14 +37,16 @@ def getPosts(galleryId, pageNo):
         date = tr.find("td", {"class": "gall_date"}).text
 
         posts.append((num, writer, title, date))
-    
+
     return posts
+
 
 def GetPost(galleryId, num):
     url = "https://gall.dcinside.com/board/view/?id=" + galleryId + "&no=" + num
     response = requests.get(url, headers=headers)
 
     return response
+
 
 def ParsePostHeader(html):
     soup = bs4.BeautifulSoup(html, "html.parser")
@@ -55,7 +61,7 @@ def ParsePostHeader(html):
     ip = writerData["data-ip"]
     uid = writerData["data-uid"]
 
-    data = {} 
+    data = {}
     data["title"] = title
     data["nick"] = nick
     if ip != "":
@@ -64,16 +70,17 @@ def ParsePostHeader(html):
 
     return data
 
+
 def ParsePostBody(html):
     soup = bs4.BeautifulSoup(html, "html.parser")
 
     # postHeader = soup.find("div", {"class": "gall_writer ub-writer"})
-    content = soup.find("div", {'class':'write_div'})
+    content = soup.find("div", {'class': 'write_div'})
 
     PostBody = ""
 
     for element in content:
-        if element.text =="":
+        if element.text == "":
             continue
 
         PostBody += element.text + "\n"
@@ -89,7 +96,7 @@ def GetComment(html):
     e_s_n_o = soup.find("input", {"id": "e_s_n_o"})["value"]
 
     cmt_headers = {
-        "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15",
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "Accept": "application/json, text/javascript, */*; q=0.01",
         "Accept-Language": "ko-KR,ko;q=0.9",
@@ -113,22 +120,31 @@ def GetComment(html):
     }
 
     raw = requests.post(url, data=data, headers=cmt_headers).json()
-    data = {
-        "header": "",
-        "comments": []
-    }
 
-    data["header"] = "댓글 수: %s" % raw["total_cnt"]
+    data = OrderedDict({
+        "header": "댓글 수: %s" % raw["total_cnt"],
+        "comments": {}
+    })
 
     if raw["comments"] != None:
         for e in raw["comments"]:
             comment = {}
+
+            comment["no"] = e["no"]
+            comment["depth"] = e["depth"]
+            comment["c_no"] = e["c_no"]
             comment["memo"] = e["memo"]
             comment["reg_date"] = e["reg_date"]
             comment["name"] = e["name"]
             if e["nicktype"] == "00":
                 comment["name"] += "(" + e["ip"] + ")"
-            
-            data["comments"].append(comment)
+
+            depth = int(e["depth"])
+            if depth == 0:
+                comment["subcomments"] = []
+                data["comments"] = {comment["no"]: comment}
+            else:
+                parents = data["comments"].get(e["c_no"], "0")
+                parents["subcomments"].append(comment)
 
     return data
