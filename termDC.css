@@ -48,3 +48,7 @@ CommentAreaWidget {
     /* height: 25; */
     /* background: midnightblue; */
 }
+
+.subCommentAreaWidget {
+    margin-left: 2;
+}
