@@ -87,12 +87,11 @@ class SubCommentItemStatic(Static):
         Static.__init__(self)
         self.subCommentObject = subCommentObject
 
-    # raise Exception("**", self.commentObject)
     def compose(self) -> ComposeResult:
         for e in self.subCommentObject:
-            yield CommentWriterStatic("  ┗ " + e["name"])
-            yield CommentMemoStatic("    " + e["memo"])
-            yield CommentDateStatic("    " + e["reg_date"])
+            yield CommentWriterStatic("┗ " + e["name"], classes="subCommentAreaWidget")
+            yield CommentMemoStatic(e["memo"], classes="subCommentAreaWidget")
+            yield CommentDateStatic(e["reg_date"], classes="subCommentAreaWidget")
 
 
 class CommentAreaWidget(Widget):
