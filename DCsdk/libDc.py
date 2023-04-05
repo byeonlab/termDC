@@ -8,7 +8,7 @@ HEADERS = {
 }
 
 class Gallery:
-    def __init__(self, id, page):
+    def __init__(self, id, page=1):
         self.id = id
         self.page = page
 

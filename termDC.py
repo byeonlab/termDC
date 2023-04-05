@@ -14,18 +14,17 @@ class PostReadScreen(Screen):
     ]
 
     def __init__(self, gallery_id, post_no):
-        Screen.__init__(self)
-        self.Post = Post(gallery_id, post_no)
+        super().__init__()
+        self.post = Post(gallery_id, post_no)
 
     def compose(self) -> ComposeResult:
-        yield PostHeaderWidget(self.Post.headers())
-        yield PostBodyWidget(self.Post.body())
-        yield CommentAreaWidget(self.Post.comments())
+        yield PostHeaderWidget(self.post.headers())
+        yield PostBodyWidget(self.post.body())
+        yield CommentAreaWidget(self.post.comments())
         yield Footer()
 
     def action_quit_post_read(self) -> None:
         self.app.pop_screen()
-        self.compose()
         
 class PostListScreen(Screen):
     BINDINGS = [
@@ -36,8 +35,8 @@ class PostListScreen(Screen):
     ]
 
     def __init__(self, gallery_id):
-        Screen.__init__(self)
-        self.Gallery = Gallery(gallery_id, 1)
+        super().__init__()
+        self.gallery = Gallery(gallery_id)
 
     def compose(self) -> ComposeResult:
         yield PostList()
@@ -50,24 +49,24 @@ class PostListScreen(Screen):
     def on_data_table_row_selected(self, event) -> None:
         table = self.query_one(PostList)
         post_no = table.get_row_at(event.cursor_row)[0]
-        self.app.push_screen(PostReadScreen(self.Gallery.id, post_no))
+        self.app.push_screen(PostReadScreen(self.gallery.id, post_no))
 
     def action_quit_post_list(self) -> None:
         self.app.pop_screen()
 
     def action_next_page(self) -> None:
-        self.Gallery.increment_page()
+        self.gallery.increment_page()
         self.populate_list()
 
     def action_prev_page(self) -> None:
-        self.Gallery.decrement_page()
+        self.gallery.decrement_page()
         self.populate_list()
 
     def action_refresh(self) -> None:
         self.populate_list()
 
     def populate_list(self):
-        rows = iter(self.Gallery.posts())
+        rows = iter(self.gallery.posts())
         table = self.query_one(PostList)
         table.clear()
         table.add_rows(rows)        
@@ -84,8 +83,8 @@ class IndexScreen(Screen):
         table.focus()
 
     def on_data_table_row_selected(self, event) -> None:
-        GalleryId = event.row_key.value
-        self.app.push_screen(PostListScreen(GalleryId))
+        gallery_id = event.row_key.value
+        self.app.push_screen(PostListScreen(gallery_id))
 
 class termDC(App):
     CSS_PATH = "termDC.css"
