@@ -1,24 +1,28 @@
-from collections import OrderedDict
-
 import requests
 import bs4
+from collections import OrderedDict
 
+"""HTTP Headers for gallery requests"""
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15"
 }
 
 class Gallery:
-    def __init__(self, id, page=1):
+    """Represents specific gallery with gallery id"""
+    def __init__(self, id: str, page=1: int):
         self.id = id
         self.page = page
 
+    """Increments page number""" 
     def increment_page(self) -> None:
         self.page += 1
 
+    """Decrements page number"""
     def decrement_page(self) -> None:
         if self.page > 1:
             self.page -= 1
 
+    """Returns list of posts of current page"""
     def posts(self) -> list:
         response = requests.get(
             "https://gall.dcinside.com/board/lists", 
@@ -47,7 +51,7 @@ class Gallery:
             ip = writer_data["data-ip"]
             nick = writer_data["data-nick"]
             writer = nick
-            if ip != "":
+            if ip is not "":
                 writer += f"({ip})" 
 
             # date
@@ -58,7 +62,8 @@ class Gallery:
         return posts
 
 class Post:
-    def __init__(self, gallery_id, no):
+    """Represents a post with a specific gallery id and post number"""
+    def __init__(self, gallery_id: str, no: str):
         self.gallery_id = gallery_id
         self.no = no
         self.http_response = requests.get(
@@ -70,9 +75,11 @@ class Post:
             }
         )
 
+    """Returns html code for a post"""
     def get_html(self) -> str:
         return self.http_response.text
 
+    """Returns post header data(title, writer, date) as dict"""
     def headers(self) -> dict:
         soup = bs4.BeautifulSoup(self.http_response.text, "html.parser")
         content = soup.find("div", {"class": "gallview_head"})
@@ -88,11 +95,12 @@ class Post:
         headers["title"] = title
         headers["nick"] = nick
         if ip != "":
-            headers["nick"] += "(%s)" % ip
+            headers["nick"] += f"({ip})"
         headers["date"] = date
 
         return headers
 
+    """Returns post body as string"""
     def body(self) -> str:
         soup = bs4.BeautifulSoup(self.http_response.text, "html.parser")
 
@@ -106,8 +114,9 @@ class Post:
             body += f"{element.text}\n"
 
         return body
-  
-    def comments(self, comment_page=1) -> OrderedDict:
+
+    """Returns comment data as OrderedDict"""
+    def comments(self, comment_page=1: int) -> OrderedDict:
         soup = bs4.BeautifulSoup(self.http_response.text, "html.parser")
 
         COMMENT_HEADERS = HEADERS.copy()
@@ -149,7 +158,6 @@ class Post:
         if json_response["comments"] != None:
             for e in json_response["comments"]:
                 comment = {}
-
                 comment["no"] = e["no"]
                 comment["depth"] = e["depth"]
                 comment["c_no"] = e["c_no"]
