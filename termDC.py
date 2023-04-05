@@ -15,15 +15,12 @@ class PostReadScreen(Screen):
 
     def __init__(self, galleryId, postNo):
         Screen.__init__(self)
-        # self.postNo = postNo 
-        # self.galleryId = galleryId
-        self.html = libDc.get_post_html(galleryId, postNo).text
-        self.commentData = libDc.get_commemt_data(self.html)
+        self.Post = libDc.Post(galleryId, postNo)
 
     def compose(self) -> ComposeResult:
-        yield PostHeaderWidget(libDc.parse_post_header(self.html))
-        yield PostBodyWidget(libDc.parse_post_body(self.html))
-        yield CommentAreaWidget(self.commentData)
+        yield PostHeaderWidget(self.Post.headers())
+        yield PostBodyWidget(self.Post.body())
+        yield CommentAreaWidget(self.Post.comments())
         yield Footer()
 
     def action_quit_post_read(self) -> None:
@@ -40,44 +37,41 @@ class PostListScreen(Screen):
 
     def __init__(self, galleryId):
         Screen.__init__(self)
-        self.galleryId = galleryId 
-        self.pageNo = 1
+        self.Gallery = libDc.Gallery(galleryId, 1)
 
     def compose(self) -> ComposeResult:
         yield PostList()
         yield Footer()
 
     def on_mount(self) -> None:
-        table = self.query_one(PostList)
-        rows = iter(libDc.get_post_list(self.galleryId, self.pageNo) )
+        rows = iter(self.Gallery.posts())
 
+        table = self.query_one(PostList)
         table.add_rows(rows)
         table.focus()
 
     def on_data_table_row_selected(self, event) -> None:
         table = self.query_one(PostList)
         postNo = table.get_row_at(event.cursor_row)[0]
-        self.app.push_screen(PostReadScreen(self.galleryId, postNo))
+        self.app.push_screen(PostReadScreen(self.Gallery.id, postNo))
 
     def action_quit_post_list(self) -> None:
         self.app.pop_screen()
 
     def action_next_page(self) -> None:
-        self.pageNo += 1
+        self.Gallery.increment_page()
+
         self.populate_list()
 
     def action_prev_page(self) -> None:
-        if self.pageNo == 1:
-            return None
-
-        self.pageNo -= 1
+        self.Gallery.decrement_page()
         self.populate_list()
 
     def action_refresh(self) -> None:
         self.populate_list()
 
     def populate_list(self):
-        rows = iter(libDc.get_post_list(self.galleryId, self.pageNo))
+        rows = iter(self.Gallery.posts())
         table = self.query_one(PostList)
         table.clear()
         table.add_rows(rows)        
