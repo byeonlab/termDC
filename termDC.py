@@ -13,9 +13,9 @@ class PostReadScreen(Screen):
         ("q", "quit_post_read", "Quit"),
     ]
 
-    def __init__(self, galleryId, postNo):
+    def __init__(self, gallery_id, post_no):
         Screen.__init__(self)
-        self.Post = libDc.Post(galleryId, postNo)
+        self.Post = libDc.Post(gallery_id, post_no)
 
     def compose(self) -> ComposeResult:
         yield PostHeaderWidget(self.Post.headers())
@@ -35,24 +35,21 @@ class PostListScreen(Screen):
         ("r", "refresh", "Refresh"),
     ]
 
-    def __init__(self, galleryId):
+    def __init__(self, gallery_id):
         Screen.__init__(self)
-        self.Gallery = libDc.Gallery(galleryId, 1)
+        self.Gallery = libDc.Gallery(gallery_id, 1)
 
     def compose(self) -> ComposeResult:
         yield PostList()
         yield Footer()
 
     def on_mount(self) -> None:
-        rows = iter(self.Gallery.posts())
-        table = self.query_one(PostList)
-        table.add_rows(rows)
-        table.focus()
+        self.populate_list()
 
     def on_data_table_row_selected(self, event) -> None:
         table = self.query_one(PostList)
-        postNo = table.get_row_at(event.cursor_row)[0]
-        self.app.push_screen(PostReadScreen(self.Gallery.id, postNo))
+        post_no = table.get_row_at(event.cursor_row)[0]
+        self.app.push_screen(PostReadScreen(self.Gallery.id, post_no))
 
     def action_quit_post_list(self) -> None:
         self.app.pop_screen()
