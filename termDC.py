@@ -6,7 +6,7 @@ from textual.widgets import Header, Footer
 from textual.screen import Screen
 
 from LibTermDc.widgets import GalleryList, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget
-from DCsdk import libDc
+from dcsdk.libdc import Gallery, Post
 
 class PostReadScreen(Screen):
     BINDINGS = [
@@ -15,7 +15,7 @@ class PostReadScreen(Screen):
 
     def __init__(self, gallery_id, post_no):
         Screen.__init__(self)
-        self.Post = libDc.Post(gallery_id, post_no)
+        self.Post = Post(gallery_id, post_no)
 
     def compose(self) -> ComposeResult:
         yield PostHeaderWidget(self.Post.headers())
@@ -37,7 +37,7 @@ class PostListScreen(Screen):
 
     def __init__(self, gallery_id):
         Screen.__init__(self)
-        self.Gallery = libDc.Gallery(gallery_id, 1)
+        self.Gallery = Gallery(gallery_id, 1)
 
     def compose(self) -> ComposeResult:
         yield PostList()
@@ -46,7 +46,7 @@ class PostListScreen(Screen):
     def on_mount(self) -> None:
         self.populate_list()
         self.query_one(PostList).focus()
-        
+
     def on_data_table_row_selected(self, event) -> None:
         table = self.query_one(PostList)
         post_no = table.get_row_at(event.cursor_row)[0]
