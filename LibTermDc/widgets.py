@@ -6,7 +6,7 @@ from textual.app import ComposeResult, Widget
 
 class GalleryList(DataTable):
     def __init__(self):
-        DataTable.__init__(self)
+        super().__init__()
         self.cursor_type = "row"
         self.add_columns("Gallery")
 
@@ -15,7 +15,7 @@ class GalleryList(DataTable):
 
 class PostList(DataTable):
     def __init__(self):
-        DataTable.__init__(self)
+        super().__init__()
         self.cursor_type = "row"
         self.add_columns("No", "Writer", "Title", "Date")
 
@@ -36,7 +36,7 @@ class PostDateStatic(Static):
 
 class PostHeaderWidget(Widget):
     def __init__(self, PostHeaderData):
-        Widget.__init__(self)
+        super().__init__()
         self.title = PostHeaderData["title"]
         self.writer = PostHeaderData["nick"]
         self.date = PostHeaderData["date"]
@@ -72,7 +72,7 @@ class CommentDateStatic(Static):
 
 class CommentItemStatic(Static):
     def __init__(self, commentObject):
-        Static.__init__(self)
+        super().__init__()
         self.commentObject = commentObject
 
     def compose(self) -> ComposeResult:
@@ -84,7 +84,7 @@ class CommentItemStatic(Static):
 
 class SubCommentItemStatic(Static):
     def __init__(self, subCommentObject):
-        Static.__init__(self)
+        super().__init__()
         self.subCommentObject = subCommentObject
 
     def compose(self) -> ComposeResult:
@@ -96,7 +96,7 @@ class SubCommentItemStatic(Static):
 
 class CommentAreaWidget(Widget):
     def __init__(self, commentData):
-        Widget.__init__(self)
+        super().__init__()
         self.commentData = commentData
 
     def compose(self) -> ComposeResult:
