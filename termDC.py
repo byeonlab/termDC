@@ -17,12 +17,12 @@ class PostReadScreen(Screen):
         Screen.__init__(self)
         # self.postNo = postNo 
         # self.galleryId = galleryId
-        self.html = libDc.GetPost(galleryId, postNo).text
-        self.commentData = libDc.GetComment(self.html)
+        self.html = libDc.get_post_html(galleryId, postNo).text
+        self.commentData = libDc.get_commemt_data(self.html)
 
     def compose(self) -> ComposeResult:
-        yield PostHeaderWidget(libDc.ParsePostHeader(self.html))
-        yield PostBodyWidget(libDc.ParsePostBody(self.html))
+        yield PostHeaderWidget(libDc.parse_post_header(self.html))
+        yield PostBodyWidget(libDc.parse_post_body(self.html))
         yield CommentAreaWidget(self.commentData)
         yield Footer()
 
@@ -49,7 +49,7 @@ class PostListScreen(Screen):
 
     def on_mount(self) -> None:
         table = self.query_one(PostList)
-        rows = iter(libDc.getPosts(self.galleryId, self.pageNo) )
+        rows = iter(libDc.get_post_list(self.galleryId, self.pageNo) )
 
         table.add_rows(rows)
         table.focus()
@@ -77,7 +77,7 @@ class PostListScreen(Screen):
         self.populate_list()
 
     def populate_list(self):
-        rows = iter(libDc.getPosts(self.galleryId, self.pageNo))
+        rows = iter(libDc.get_post_list(self.galleryId, self.pageNo))
         table = self.query_one(PostList)
         table.clear()
         table.add_rows(rows)        

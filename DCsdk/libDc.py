@@ -8,7 +8,7 @@ headers = {
 }
 
 
-def getPosts(galleryId, pageNo):
+def get_post_list(galleryId, pageNo):
     if type(pageNo) is not int:
         raise TypeError("pageNo must be an integer")
 
@@ -41,14 +41,14 @@ def getPosts(galleryId, pageNo):
     return posts
 
 
-def GetPost(galleryId, num):
+def get_post_html(galleryId, num):
     url = "https://gall.dcinside.com/board/view/?id=" + galleryId + "&no=" + num
     response = requests.get(url, headers=headers)
 
     return response
 
 
-def ParsePostHeader(html):
+def parse_post_header(html):
     soup = bs4.BeautifulSoup(html, "html.parser")
 
     content = soup.find("div", {"class": "gallview_head"})
@@ -71,7 +71,7 @@ def ParsePostHeader(html):
     return data
 
 
-def ParsePostBody(html):
+def parse_post_body(html):
     soup = bs4.BeautifulSoup(html, "html.parser")
 
     # postHeader = soup.find("div", {"class": "gall_writer ub-writer"})
@@ -88,7 +88,7 @@ def ParsePostBody(html):
     return PostBody
 
 
-def GetComment(html):
+def get_commemt_data(html):
     soup = bs4.BeautifulSoup(html, "html.parser")
 
     galleryId = soup.find("input", {"id": "gallery_id"})["value"]
