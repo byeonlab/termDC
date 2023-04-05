@@ -5,7 +5,7 @@ from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer
 from textual.screen import Screen
 
-from LibTermDc.widgets import GalleryList, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget
+from libtermdc.widgets import GalleryList, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget
 from dcsdk.libdc import Gallery, Post
 
 class PostReadScreen(Screen):
