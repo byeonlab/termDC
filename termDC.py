@@ -45,7 +45,8 @@ class PostListScreen(Screen):
 
     def on_mount(self) -> None:
         self.populate_list()
-
+        self.query_one(PostList).focus()
+        
     def on_data_table_row_selected(self, event) -> None:
         table = self.query_one(PostList)
         post_no = table.get_row_at(event.cursor_row)[0]
