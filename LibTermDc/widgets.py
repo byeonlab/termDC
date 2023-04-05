@@ -35,11 +35,11 @@ class PostDateStatic(Static):
 
 
 class PostHeaderWidget(Widget):
-    def __init__(self, PostHeaderData):
+    def __init__(self, headers):
         super().__init__()
-        self.title = PostHeaderData["title"]
-        self.writer = PostHeaderData["nick"]
-        self.date = PostHeaderData["date"]
+        self.title = headers["title"]
+        self.writer = headers["nick"]
+        self.date = headers["date"]
 
     def compose(self) -> ComposeResult:
         # render
@@ -71,36 +71,36 @@ class CommentDateStatic(Static):
 
 
 class CommentItemStatic(Static):
-    def __init__(self, commentObject):
+    def __init__(self, comment):
         super().__init__()
-        self.commentObject = commentObject
+        self.comment = comment
 
     def compose(self) -> ComposeResult:
-        yield CommentWriterStatic(self.commentObject["name"])
-        yield CommentMemoStatic(self.commentObject["memo"])
-        yield CommentDateStatic(self.commentObject["reg_date"])
-        yield SubCommentItemStatic(self.commentObject["subcomments"])
+        yield CommentWriterStatic(self.comment["name"])
+        yield CommentMemoStatic(self.comment["memo"])
+        yield CommentDateStatic(self.comment["reg_date"])
+        yield SubCommentItemStatic(self.comment["subcomments"])
 
 
 class SubCommentItemStatic(Static):
-    def __init__(self, subCommentObject):
+    def __init__(self, subcomments):
         super().__init__()
-        self.subCommentObject = subCommentObject
+        self.subcomments = subcomments
 
     def compose(self) -> ComposeResult:
-        for e in self.subCommentObject:
-            yield CommentWriterStatic("┗ " + e["name"], classes="subCommentAreaWidget")
-            yield CommentMemoStatic(e["memo"], classes="subCommentAreaWidget")
-            yield CommentDateStatic(e["reg_date"], classes="subCommentAreaWidget")
+        for subcomment in self.subcomments:
+            yield CommentWriterStatic("┗ " + subcomment["name"], classes="subCommentAreaWidget")
+            yield CommentMemoStatic(subcomment["memo"], classes="subCommentAreaWidget")
+            yield CommentDateStatic(subcomment["reg_date"], classes="subCommentAreaWidget")
 
 
 class CommentAreaWidget(Widget):
-    def __init__(self, commentData):
+    def __init__(self, comment_data):
         super().__init__()
-        self.commentData = commentData
+        self.comment_data = comment_data
 
     def compose(self) -> ComposeResult:
         # render
-        yield CommentAreaHeaderStatic(self.commentData["header"])
-        for comment in self.commentData["comments"].values():
+        yield CommentAreaHeaderStatic(self.comment_data["header"])
+        for comment in self.comment_data["comments"].values():
             yield CommentItemStatic(comment)
