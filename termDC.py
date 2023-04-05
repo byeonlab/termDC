@@ -45,7 +45,6 @@ class PostListScreen(Screen):
 
     def on_mount(self) -> None:
         rows = iter(self.Gallery.posts())
-
         table = self.query_one(PostList)
         table.add_rows(rows)
         table.focus()
@@ -60,7 +59,6 @@ class PostListScreen(Screen):
 
     def action_next_page(self) -> None:
         self.Gallery.increment_page()
-
         self.populate_list()
 
     def action_prev_page(self) -> None:
