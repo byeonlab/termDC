@@ -9,7 +9,7 @@ HEADERS = {
 
 class Gallery:
     """Represents specific gallery with gallery id"""
-    def __init__(self, id: str, page=1: int):
+    def __init__(self, id: str, page: int = 1):
         self.id = id
         self.page = page
 
@@ -116,7 +116,7 @@ class Post:
         return body
 
     """Returns comment data as OrderedDict"""
-    def comments(self, comment_page=1: int) -> OrderedDict:
+    def comments(self, comment_page: int = 1) -> OrderedDict:
         soup = bs4.BeautifulSoup(self.http_response.text, "html.parser")
 
         COMMENT_HEADERS = HEADERS.copy()
