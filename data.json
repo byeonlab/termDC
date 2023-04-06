@@ -1,6 +1,8 @@
 {
     "galleries": [
-        {"name": "프로그래밍", "id": "programming"},
-        {"name": "식물", "id": "tree"}
+        {"name": "프로그래밍 갤러리", "id": "programming", "type": "major"},
+        {"name": "식물 갤러리", "id": "tree", "type": "major"},
+        {"name": "Github 마이너 갤러리", "id": "github", "type": "minor"},
+        {"name": "명일방주 마이너 갤러리", "id": "mibj", "type": "minor"}
     ]
 }

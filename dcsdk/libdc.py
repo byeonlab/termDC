@@ -8,6 +8,9 @@ HEADERS = {
 }
 
 class Gallery:
+    BASE_URL = "https://gall.dcinside.com/board/lists/"
+    TYPE = "major"
+
     """Represents specific gallery with gallery id"""
     def __init__(self, id: str, page: int = 1):
         self.id = id
@@ -25,7 +28,7 @@ class Gallery:
     """Returns list of posts of current page"""
     def posts(self) -> list:
         response = requests.get(
-            "https://gall.dcinside.com/board/lists", 
+            url=self.BASE_URL, 
             headers=HEADERS,
             params={
                 "id" : self.id,
@@ -51,7 +54,7 @@ class Gallery:
             ip = writer_data["data-ip"]
             nick = writer_data["data-nick"]
             writer = nick
-            if ip is not "":
+            if ip:
                 writer += f"({ip})" 
 
             # date
@@ -61,13 +64,20 @@ class Gallery:
 
         return posts
 
+class MinorGallery(Gallery):
+    """Represents a minor gallery with given gallery id"""
+    BASE_URL = "https://gall.dcinside.com/mgallery/board/lists/"
+    TYPE = "minor"
+
 class Post:
+    BASE_URL = "https://gall.dcinside.com/board/view/"
+
     """Represents a post with a specific gallery id and post number"""
     def __init__(self, gallery_id: str, no: str):
         self.gallery_id = gallery_id
         self.no = no
         self.http_response = requests.get(
-            "https://gall.dcinside.com/board/view/",
+            url=self.BASE_URL,
             headers=HEADERS,
             params={
                 "id" : gallery_id,
@@ -128,7 +138,7 @@ class Post:
             "Accept-Encoding": "gzip, deflate, br",
             "Host": "gall.dcinside.com",
             "Origin": "https://gall.dcinside.com",
-            "Referer": f"https://gall.dcinside.com/board/view/?id={self.gallery_id}&no={self.no}",
+            "Referer": f"{self.BASE_URL}?id={self.gallery_id}&no={self.no}",
             "Connection": "keep-alive",
             "X-Requested-With": "XMLHttpRequest"
         })
@@ -151,12 +161,14 @@ class Post:
         json_response = requests.post(url, data=data, headers=COMMENT_HEADERS).json()
 
         comment_data = OrderedDict({
-            "header": f"댓글 수: {json_response['total_cnt']}",
+            "header": {"comment_cnt": json_response['total_cnt']},
             "comments": {}
         })
 
         if json_response["comments"] != None:
             for e in json_response["comments"]:
+                if e["name"] == "댓글돌이":
+                    continue
                 comment = {}
                 comment["no"] = e["no"]
                 comment["depth"] = e["depth"]
@@ -176,3 +188,6 @@ class Post:
                     parents["subcomments"].append(comment)
 
         return comment_data      
+
+class MinorPost(Post):
+    BASE_URL = "https://gall.dcinside.com/mgallery/board/view/"

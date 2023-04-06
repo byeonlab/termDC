@@ -7,7 +7,7 @@ class GalleryList(DataTable):
     def __init__(self):
         super().__init__()
         self.cursor_type = "row"
-        self.add_columns("Gallery")
+        self.add_columns("Name", "Type")
 
 ##$ Post List ###
 class PostList(DataTable):
@@ -56,8 +56,12 @@ class PostBodyWidget(Static):
 ## Comments ###
 class CommentAreaHeaderStatic(Static):
     """Displays comment area header"""
-    pass
+    def __init__(self, comment_header: dict):
+        super().__init__()
+        self.comment_header = comment_header
 
+    def on_mount(self) -> None:
+        self.update(f"댓글 수: {self.comment_header['comment_cnt']}")
 
 class CommentWriterStatic(Static):
     """Displays comment writer"""

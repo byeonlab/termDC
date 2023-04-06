@@ -10,7 +10,7 @@ from textual.screen import Screen
 
 # termDC libraries
 from libtermdc.widgets import GalleryList, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget
-from dcsdk.libdc import Gallery, Post
+from dcsdk.libdc import Gallery, MinorGallery, Post, MinorPost
 
 class PostReadScreen(Screen):
     BINDINGS = [
@@ -18,9 +18,12 @@ class PostReadScreen(Screen):
     ]
 
     """Screen that displays details of post with given gallery id and post number"""
-    def __init__(self, gallery_id: str, post_no: str):
+    def __init__(self, gallery_id: str, gallery_type: str, post_no: str):
         super().__init__()
-        self.post = Post(gallery_id, post_no)
+        if gallery_type == "major":
+            self.post = Post(gallery_id, post_no)
+        if gallery_type == "minor":
+            self.post = MinorPost(gallery_id, post_no)
 
     """Renders details of post and app footer"""
     def compose(self) -> ComposeResult:
@@ -41,10 +44,13 @@ class PostListScreen(Screen):
         ("r", "refresh", "Refresh"),
     ]
 
-    """Screen that displays posts of gallery with a given gallery id"""
-    def __init__(self, gallery_id: str):
+    """Screen that displays posts of gallery with a given gallery metadata"""
+    def __init__(self, gallery_id: str, gallery_type: str):
         super().__init__()
-        self.gallery = Gallery(gallery_id)
+        if gallery_type == "major":
+            self.gallery = Gallery(gallery_id)
+        if gallery_type == "minor":
+            self.gallery = MinorGallery(gallery_id)
 
     """Renders table for post list and app footer"""
     def compose(self) -> ComposeResult:
@@ -60,7 +66,7 @@ class PostListScreen(Screen):
     def on_data_table_row_selected(self, event) -> None:
         table = self.query_one(PostList)
         post_no = table.get_row_at(event.cursor_row)[0]
-        self.app.push_screen(PostReadScreen(self.gallery.id, post_no))
+        self.app.push_screen(PostReadScreen(self.gallery.id, self.gallery.TYPE, post_no))
 
     """Pops itself on 'q' input"""
     def action_quit_post_list(self) -> None:
@@ -102,13 +108,16 @@ class GalleryListScreen(Screen):
     def on_mount(self) -> None:
         table = self.query_one(GalleryList)
         for gallery in self.galleries:
-            table.add_row(gallery["name"], key=gallery["id"])
+            table.add_row(gallery["name"], gallery["type"], key=gallery["id"])
         table.focus()
 
     """Push PostListScreen with given gallery id when row is selected"""
     def on_data_table_row_selected(self, event) -> None:
         gallery_id = event.row_key.value
-        self.app.push_screen(PostListScreen(gallery_id))
+        row_data = self.query_one(GalleryList).get_row(gallery_id)
+        gallery_type = row_data[1]
+
+        self.app.push_screen(PostListScreen(gallery_id, gallery_type))
 
 class termDC(App):
     CSS_PATH = "termDC.css"
