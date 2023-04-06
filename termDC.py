@@ -1,10 +1,14 @@
+# Built-in libraries
+import json
 import pkg_resources
 pkg_resources.require("textual==0.17.0")
 
+# Textual libraries
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer
 from textual.screen import Screen
 
+# termDC libraries
 from libtermdc.widgets import GalleryList, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget
 from dcsdk.libdc import Gallery, Post
 
@@ -85,6 +89,9 @@ class PostListScreen(Screen):
 
 class GalleryListScreen(Screen):
     """Index screen that displays gallery list"""
+    def __init__(self, galleries: list):
+        super().__init__()
+        self.galleries = galleries
 
     """Renders app header and gallery list"""
     def compose(self) -> ComposeResult:
@@ -94,8 +101,8 @@ class GalleryListScreen(Screen):
     """Populates gallery list"""
     def on_mount(self) -> None:
         table = self.query_one(GalleryList)
-        table.add_row("프로그래밍 갤러리", key="programming")
-        table.add_row("식물 갤러리", key="tree")
+        for gallery in self.galleries:
+            table.add_row(gallery["name"], key=gallery["id"])
         table.focus()
 
     """Push PostListScreen with given gallery id when row is selected"""
@@ -108,5 +115,8 @@ class termDC(App):
 
     """Pushes GalleryListScreen on application startup"""
     def on_mount(self) -> None:
-        self.push_screen(GalleryListScreen())
+        with open("data.json") as data_file:
+            data = json.load(data_file)
+        galleries = data["galleries"]
+        self.push_screen(GalleryListScreen(galleries))
 

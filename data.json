@@ -1,0 +1,6 @@
+{
+    "galleries": [
+        {"name": "프로그래밍", "id": "programming"},
+        {"name": "식물", "id": "tree"}
+    ]
+}
