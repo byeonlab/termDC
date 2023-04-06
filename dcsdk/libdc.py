@@ -42,12 +42,12 @@ class Gallery:
 
         for tr in trs:
             # title
-            title = tr.find("td", {"class": "gall_tit"}).find("a").text
+            title = tr.find("td", {"class": "gall_tit"}).find("a").get_text()
             if tr.find("span", {"class": "reply_num"}):
-                title += tr.find("span", {"class": "reply_num"}).text
+                title += tr.find("span", {"class": "reply_num"}).get_text()
 
             # num
-            num = tr.find("td", {"class": "gall_num"}).text
+            num = tr.find("td", {"class": "gall_num"}).get_text()
 
             # writer
             writer_data = tr.find("td", {"class": "gall_writer ub-writer"})
@@ -58,7 +58,7 @@ class Gallery:
                 writer += f"({ip})" 
 
             # date
-            date = tr.find("td", {"class": "gall_date"}).text
+            date = tr.find("td", {"class": "gall_date"}).get_text()
 
             posts.append((num, writer, title, date))
 
@@ -93,8 +93,8 @@ class Post:
     def headers(self) -> dict:
         soup = bs4.BeautifulSoup(self.http_response.text, "html.parser")
         content = soup.find("div", {"class": "gallview_head"})
-        title = content.find("span", {"class": "title_subject"}).text
-        date = content.find("span", {"class": "gall_date"}).text
+        title = content.find("span", {"class": "title_subject"}).get_text()
+        date = content.find("span", {"class": "gall_date"}).get_text()
 
         writer_data = content.find("div", {"class": "gall_writer ub-writer"})
         nick = writer_data["data-nick"]
@@ -113,15 +113,8 @@ class Post:
     """Returns post body as string"""
     def body(self) -> str:
         soup = bs4.BeautifulSoup(self.http_response.text, "html.parser")
-
         write_div = soup.find("div", {'class': 'write_div'})
-        body = ""
-
-        for element in write_div:
-            if element.text == "":
-                continue
-
-            body += f"{element.text}\n"
+        body = write_div.get_text("\n")
 
         return body
 
