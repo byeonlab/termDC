@@ -25,9 +25,10 @@ PostBodyWidget {
     /* border-bottom: solid wheat; */
 }
 
-CommentItemStatic {
-    background:#3f3e3d;
+CommentItemWidget {
+    /* background:#3f3e3d; */
     border-bottom: solid lightslategray;
+    height: auto;
 }
 
 CommentWriterStatic {
@@ -43,8 +44,8 @@ CommentAreaHeaderStatic {
 }
 
 CommentAreaWidget {
-    height: 40;
-    overflow-y: auto;
+    height: auto;
+    /* overflow-y: auto; */
     /* height: 25; */
     /* background: midnightblue; */
 }
