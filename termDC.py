@@ -83,7 +83,7 @@ class PostListScreen(Screen):
         table.clear()
         table.add_rows(rows)        
 
-class IndexScreen(Screen):
+class GalleryListScreen(Screen):
     """Index screen that displays gallery list"""
 
     """Renders app header and gallery list"""
@@ -106,7 +106,7 @@ class IndexScreen(Screen):
 class termDC(App):
     CSS_PATH = "termDC.css"
 
-    """Pushes IndexScreen on app startup"""
+    """Pushes GalleryListScreen on application startup"""
     def on_mount(self) -> None:
-        self.push_screen(IndexScreen())
+        self.push_screen(GalleryListScreen())
 
