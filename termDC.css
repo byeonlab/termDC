@@ -40,7 +40,8 @@ CommentDateStatic {
 }
 
 CommentAreaHeaderStatic {
-    color: orange;
+    color: white;
+    background: green;
 }
 
 CommentAreaWidget {
