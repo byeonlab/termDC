@@ -74,7 +74,7 @@ class CommentDateStatic(Static):
     pass
 
 
-class CommentItemStatic(Static):
+class CommentItemWidget(Widget):
     """Displays comment item"""
     def __init__(self, comment):
         super().__init__()
@@ -111,4 +111,4 @@ class CommentAreaWidget(Widget):
         # render
         yield CommentAreaHeaderStatic(self.comment_data["header"])
         for comment in self.comment_data["comments"].values():
-            yield CommentItemStatic(comment)
+            yield CommentItemWidget(comment)
