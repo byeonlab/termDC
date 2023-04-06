@@ -2,45 +2,46 @@ from textual.widgets import Static, DataTable
 from textual.app import ComposeResult, Widget
 
 ### Gallery List ###
-
-
 class GalleryList(DataTable):
+    """DataTable for gallery list"""
     def __init__(self):
         super().__init__()
         self.cursor_type = "row"
         self.add_columns("Gallery")
 
-## PostList ###
-
-
+##$ Post List ###
 class PostList(DataTable):
+    """Datatable for post list"""
     def __init__(self):
         super().__init__()
         self.cursor_type = "row"
         self.add_columns("No", "Writer", "Title", "Date")
 
-### PostRead###
-
-
+### Post Details ###
 class PostTitleStatic(Static):
+    """Displays post title"""
     pass
 
 
 class PostWriterStatic(Static):
+    """Displays post writer"""
     pass
 
 
 class PostDateStatic(Static):
+    """Displays post date"""
     pass
 
 
 class PostHeaderWidget(Widget):
+    """Widget for post header"""
     def __init__(self, headers):
         super().__init__()
         self.title = headers["title"]
         self.writer = headers["nick"]
         self.date = headers["date"]
 
+    """Renders post header"""
     def compose(self) -> ComposeResult:
         # render
         yield PostTitleStatic(self.title)
@@ -49,28 +50,32 @@ class PostHeaderWidget(Widget):
 
 
 class PostBodyWidget(Static):
+    """Displays post body"""
     pass
 
 ## Comments ###
-
-
 class CommentAreaHeaderStatic(Static):
+    """Displays comment area header"""
     pass
 
 
 class CommentWriterStatic(Static):
+    """Displays comment writer"""
     pass
 
 
 class CommentMemoStatic(Static):
+    """Displays comment memo"""
     pass
 
 
 class CommentDateStatic(Static):
+    """Displays comment date"""
     pass
 
 
 class CommentItemStatic(Static):
+    """Displays comment item"""
     def __init__(self, comment):
         super().__init__()
         self.comment = comment
@@ -83,6 +88,7 @@ class CommentItemStatic(Static):
 
 
 class SubCommentItemStatic(Static):
+    """Displays subcomments"""
     def __init__(self, subcomments):
         super().__init__()
         self.subcomments = subcomments
@@ -95,10 +101,12 @@ class SubCommentItemStatic(Static):
 
 
 class CommentAreaWidget(Widget):
+    """Widget for comment area"""
     def __init__(self, comment_data):
         super().__init__()
         self.comment_data = comment_data
 
+    """Renders comment area header and comments"""
     def compose(self) -> ComposeResult:
         # render
         yield CommentAreaHeaderStatic(self.comment_data["header"])
