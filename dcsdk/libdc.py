@@ -114,6 +114,10 @@ class Post:
     def body(self) -> str:
         soup = bs4.BeautifulSoup(self.http_response.text, "html.parser")
         write_div = soup.find("div", {'class': 'write_div'})
+        imgs = write_div.find_all("img")
+        for img in imgs:
+            # img.replace_with(f"\n Image: [@click='{img['src']}']link[/]\n")
+            img.replace_with("[이미지: 렌더링 구현예정]")
         body = write_div.get_text("\n")
 
         return body
