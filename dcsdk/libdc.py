@@ -85,10 +85,6 @@ class Post:
             }
         )
 
-    """Returns html code for a post"""
-    def get_html(self) -> str:
-        return self.http_response.text
-
     """Returns post header data(title, writer, date) as dict"""
     def headers(self) -> dict:
         soup = bs4.BeautifulSoup(self.http_response.text, "html.parser")
