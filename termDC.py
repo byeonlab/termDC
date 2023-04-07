@@ -87,7 +87,7 @@ class PostListScreen(Screen):
         self.__populate_list()
 
     """(Private) Populates post list with current page"""
-    def __populate_list(self):
+    def __populate_list(self) -> None:
         rows = iter(self.gallery.posts())
         table = self.query_one(PostList)
         table.clear()
