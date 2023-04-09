@@ -16,6 +16,10 @@ class Gallery:
         self.id = id
         self.page = page
 
+    """Set page number"""
+    def set_page(self, page_number):
+        self.page = page_number
+
     """Increments page number""" 
     def increment_page(self) -> None:
         self.page += 1

@@ -1,16 +1,47 @@
+import termDC
+
+
 # Built-in libraries
 import json
 import pkg_resources
-pkg_resources.require("textual==0.17.0")
+pkg_resources.require("textual==0.19.0")
 
 # Textual libraries
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer
-from textual.screen import Screen
+from textual.widgets import Header, Footer, Label, Input, Button
+from textual.containers import Grid
+from textual.screen import Screen, ModalScreen
+from textual.binding import Binding
 
 # termDC libraries
 from libtermdc.widgets import GalleryList, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget
 from dcsdk.libdc import Gallery, MinorGallery, Post, MinorPost
+
+class GoPageModalScreen(ModalScreen):
+    """ModalScreen for page number input"""
+
+    def compose(self) -> ComposeResult:
+        yield Grid(
+            Input(placeholder="Page Number", id="question"),
+            Button("OK", id="ok"),Button("Cancel", id="cancel"),
+            id="dialog"
+        )
+        yield Footer()
+    
+    """Focus input field"""
+    def on_mount(self) -> None:
+        self.query_one(Input).focus()
+
+    """Button actions"""
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "ok":
+            new_page = int(self.query_one(Input).value)
+            self.app.screen_stack[-2].gallery.set_page(new_page)
+            self.app.screen_stack[-2].populate_list()
+            self.app.pop_screen()
+
+        elif event.button.id == "cancel":
+            self.app.pop_screen()
 
 class PostReadScreen(Screen):
     BINDINGS = [
@@ -41,6 +72,7 @@ class PostListScreen(Screen):
         ("q", "quit_post_list", "Quit"),
         ("n", "next_page", "Next Page"),
         ("p", "prev_page", "Previous Page"),
+        ("g", "go_page", "Go Page"),
         ("r", "refresh", "Refresh"),
     ]
 
@@ -59,7 +91,7 @@ class PostListScreen(Screen):
 
     """Populates table for post list with actual posts"""
     def on_mount(self) -> None:
-        self.__populate_list()
+        self.populate_list()
         self.query_one(PostList).focus()
 
     """Pushes PostReadScreen with given gallery id and post number when a row is selected"""
@@ -75,23 +107,27 @@ class PostListScreen(Screen):
     """Goes to the next page of post list"""
     def action_next_page(self) -> None:
         self.gallery.increment_page()
-        self.__populate_list()
+        self.populate_list()
 
     """Goes to the previous page of post list"""
     def action_prev_page(self) -> None:
         self.gallery.decrement_page()
-        self.__populate_list()
+        self.populate_list()
 
     """Refreshes current page of post list"""
     def action_refresh(self) -> None:
-        self.__populate_list()
+        self.populate_list()
 
-    """(Private) Populates post list with current page"""
-    def __populate_list(self) -> None:
+    """Populates post list with current page"""
+    def populate_list(self) -> None:
         rows = iter(self.gallery.posts())
         table = self.query_one(PostList)
         table.clear()
         table.add_rows(rows)        
+
+    """Go to the page of input number"""
+    def action_go_page(self) -> None:
+        self.app.push_screen(GoPageModalScreen())
 
 class GalleryListScreen(Screen):
     """Index screen that displays gallery list"""
@@ -116,7 +152,6 @@ class GalleryListScreen(Screen):
         gallery_id = event.row_key.value
         row_data = self.query_one(GalleryList).get_row(gallery_id)
         gallery_type = row_data[1]
-
         self.app.push_screen(PostListScreen(gallery_id, gallery_type))
 
 class termDC(App):
@@ -127,5 +162,9 @@ class termDC(App):
         with open("data.json") as data_file:
             data = json.load(data_file)
         galleries = data["galleries"]
+
         self.push_screen(GalleryListScreen(galleries))
 
+if __name__ == "__main__":
+    app = termDC()
+    app.run()
