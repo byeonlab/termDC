@@ -1,7 +1,21 @@
+PostListHeader {
+    height: 1;
+    color: yellow;
+    /* background: yellow; */
+    /* text-style: bold; */
+}
+
+#post_list_container {
+}
+PostListScreen {
+}
+PostList {
+}
+
 PostTitleStatic {
     text-style: bold;
     color: cyan;
-}
+}   
 
 PostWriterStatic {
     color: yellow;

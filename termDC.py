@@ -1,6 +1,3 @@
-import termDC
-
-
 # Built-in libraries
 import json
 import pkg_resources
@@ -9,12 +6,12 @@ pkg_resources.require("textual==0.19.0")
 # Textual libraries
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Label, Input, Button
-from textual.containers import Grid
+from textual.containers import Grid, Vertical
 from textual.screen import Screen, ModalScreen
 from textual.binding import Binding
 
 # termDC libraries
-from libtermdc.widgets import GalleryList, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget
+from libtermdc.widgets import GalleryList, PostListHeader, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget
 from dcsdk.libdc import Gallery, MinorGallery, Post, MinorPost
 
 class GoPageModalScreen(ModalScreen):
@@ -36,8 +33,10 @@ class GoPageModalScreen(ModalScreen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "ok":
             new_page = int(self.query_one(Input).value)
-            self.app.screen_stack[-2].gallery.set_page(new_page)
-            self.app.screen_stack[-2].populate_list()
+            parent_screen = self.app.screen_stack[-2]
+            parent_screen.gallery.set_page(new_page)
+            parent_screen.post_list_header.update_page(new_page)
+            parent_screen.populate_list()
             self.app.pop_screen()
 
         elif event.button.id == "cancel":
@@ -77,27 +76,36 @@ class PostListScreen(Screen):
     ]
 
     """Screen that displays posts of gallery with a given gallery metadata"""
-    def __init__(self, gallery_id: str, gallery_type: str):
+    def __init__(self, gallery_name: str, gallery_id: str, gallery_type: str):
         super().__init__()
         if gallery_type == "major":
             self.gallery = Gallery(gallery_id)
         if gallery_type == "minor":
             self.gallery = MinorGallery(gallery_id)
 
+        self.post_list_header = PostListHeader(gallery_name=gallery_name)   
+        self.post_list = PostList()
+
     """Renders table for post list and app footer"""
     def compose(self) -> ComposeResult:
-        yield PostList()
+        yield (
+            Vertical(
+                self.post_list_header,
+                self.post_list,
+                id="post_list_container"
+            )
+        )
         yield Footer()
 
     """Populates table for post list with actual posts"""
     def on_mount(self) -> None:
         self.populate_list()
-        self.query_one(PostList).focus()
+        self.post_list_header.update_page()
+        self.post_list.focus()
 
     """Pushes PostReadScreen with given gallery id and post number when a row is selected"""
     def on_data_table_row_selected(self, event) -> None:
-        table = self.query_one(PostList)
-        post_no = table.get_row_at(event.cursor_row)[0]
+        post_no = self.post_list.get_row_at(event.cursor_row)[0]
         self.app.push_screen(PostReadScreen(self.gallery.id, self.gallery.TYPE, post_no))
 
     """Pops itself on 'q' input"""
@@ -108,11 +116,13 @@ class PostListScreen(Screen):
     def action_next_page(self) -> None:
         self.gallery.increment_page()
         self.populate_list()
+        self.post_list_header.update_page(self.gallery.page)
 
     """Goes to the previous page of post list"""
     def action_prev_page(self) -> None:
         self.gallery.decrement_page()
         self.populate_list()
+        self.post_list_header.update_page(self.gallery.page)
 
     """Refreshes current page of post list"""
     def action_refresh(self) -> None:
@@ -121,9 +131,8 @@ class PostListScreen(Screen):
     """Populates post list with current page"""
     def populate_list(self) -> None:
         rows = iter(self.gallery.posts())
-        table = self.query_one(PostList)
-        table.clear()
-        table.add_rows(rows)        
+        self.post_list.clear()
+        self.post_list.add_rows(rows)        
 
     """Go to the page of input number"""
     def action_go_page(self) -> None:
@@ -151,8 +160,9 @@ class GalleryListScreen(Screen):
     def on_data_table_row_selected(self, event) -> None:
         gallery_id = event.row_key.value
         row_data = self.query_one(GalleryList).get_row(gallery_id)
+        gallery_name = row_data[0]
         gallery_type = row_data[1]
-        self.app.push_screen(PostListScreen(gallery_id, gallery_type))
+        self.app.push_screen(PostListScreen(gallery_name, gallery_id, gallery_type))
 
 class termDC(App):
     CSS_PATH = "termDC.css"

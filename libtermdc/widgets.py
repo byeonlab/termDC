@@ -10,6 +10,20 @@ class GalleryList(DataTable):
         self.add_columns("Name", "Type")
 
 ##$ Post List ###
+class PostListHeader(Widget):
+    def __init__(self, gallery_name: str, page: int = 1):
+        super().__init__()
+        self.gallery_name = gallery_name
+
+    def compose(self) -> ComposeResult:
+        yield Static()
+    
+    def on_mount(self):
+        self.update_page()
+
+    def update_page(self, page: int = 1):
+        self.query_one(Static).update(f"{self.gallery_name} (page: {page})")
+
 class PostList(DataTable):
     """Datatable for post list"""
     def __init__(self):
@@ -21,7 +35,6 @@ class PostList(DataTable):
 class PostTitleStatic(Static):
     """Displays post title"""
     pass
-
 
 class PostWriterStatic(Static):
     """Displays post writer"""
@@ -47,7 +60,6 @@ class PostHeaderWidget(Widget):
         yield PostTitleStatic(self.title)
         yield PostWriterStatic(self.writer)
         yield PostDateStatic(self.date)
-
 
 class PostBodyWidget(Static):
     """Displays post body"""
