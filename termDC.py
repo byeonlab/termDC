@@ -12,10 +12,43 @@ from textual.binding import Binding
 
 # termDC libraries
 from libtermdc.widgets import GalleryList, PostListHeader, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget
-from dcsdk.libdc import Gallery, MinorGallery, Post, MinorPost
+from dcsdk.libdc import Gallery, MinorGallery, Post, MinorPost, PostSearchResult
+
+class PostSearchModalScreen(ModalScreen):
+    """ModalScreen for post search"""
+    def compose(self) -> ComposeResult:
+        yield Grid(
+            Input(placeholder="Keyword", id="question"),
+            Button("OK", id="ok"),Button("Cancel", id="cancel"),
+            id="dialog"
+        )
+        yield Footer()
+    
+    """Focus input field"""
+    def on_mount(self) -> None:
+        self.query_one(Input).focus()
+
+    """Button actions"""
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "ok":
+            parent_screen = self.app.screen_stack[-2]
+            base_url = parent_screen.gallery.BASE_URL
+            gallery_id = parent_screen.gallery.id
+            s_type = "search_subject_memo"
+            s_keyword = self.query_one(Input).value
+            res = PostSearchResult(base_url, gallery_id, s_type, s_keyword)
+            # keyword = int(self.query_one(Input).value)
+            # parent_screen = self.app.screen_stack[-2]
+            # parent_screen.gallery.set_page(new_page)
+            # parent_screen.post_list_header.update_page(new_page)
+            # parent_screen.populate_list()
+            # self.app.pop_screen()
+
+        elif event.button.id == "cancel":
+            self.app.pop_screen()    
 
 class GoPageModalScreen(ModalScreen):
-    """ModalScreen for page number input"""
+    """ModalScreen for page move"""
 
     def compose(self) -> ComposeResult:
         yield Grid(
@@ -72,6 +105,7 @@ class PostListScreen(Screen):
         ("n", "next_page", "Next Page"),
         ("p", "prev_page", "Previous Page"),
         ("g", "go_page", "Go Page"),
+        ("s", "search", "Search"),
         ("r", "refresh", "Refresh"),
     ]
 
@@ -124,6 +158,14 @@ class PostListScreen(Screen):
         self.populate_list()
         self.post_list_header.update_page(self.gallery.page)
 
+    """Open page number input modal"""
+    def action_go_page(self) -> None:
+        self.app.push_screen(GoPageModalScreen())
+
+    """Open post search modal"""
+    def action_search(self) -> None:
+        self.app.push_screen(PostSearchModalScreen())
+
     """Refreshes current page of post list"""
     def action_refresh(self) -> None:
         self.populate_list()
@@ -133,10 +175,6 @@ class PostListScreen(Screen):
         rows = iter(self.gallery.posts())
         self.post_list.clear()
         self.post_list.add_rows(rows)        
-
-    """Go to the page of input number"""
-    def action_go_page(self) -> None:
-        self.app.push_screen(GoPageModalScreen())
 
 class GalleryListScreen(Screen):
     """Index screen that displays gallery list"""

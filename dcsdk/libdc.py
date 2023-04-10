@@ -1,5 +1,6 @@
 import requests
 import bs4
+import urllib.parse
 from collections import OrderedDict
 
 """HTTP Headers for gallery requests"""
@@ -188,3 +189,56 @@ class Post:
 
 class MinorPost(Post):
     BASE_URL = "https://gall.dcinside.com/mgallery/board/view/"
+
+
+class PostSearchResult:
+    pages = []
+
+    def __init__(self, base_url: str, gallery_id: str, s_type: str, s_keyword: str):
+        # https://gall.dcinside.com/board/lists/?id=programming&page=1&search_pos=-2387776&s_type=search_subject_memo&s_keyword=.EA.B8.88.EC.9C.B5
+        "https://gall.dcinside.com/board/lists?id=programming&s_type=search_subject_memo&s_keyword=.EA.B8.88.EC.9C.B5"
+        response = requests.get(
+            url=base_url, 
+            headers=HEADERS,
+            params={
+                "id": gallery_id,
+                "s_type": s_type,
+                "s_keyword": urllib.parse.quote(s_keyword)
+            }
+        )
+        
+        print(response.url)
+        soup = bs4.BeautifulSoup(response.text, "html.parser")
+        
+        paging_box = soup.find_all("div", {"class": "bottom_paging_box iconpaging"})
+    
+        
+        # for child in paging_box.find_all():
+        #     self.pages.append(
+        #         [
+        #             child.get_text(),
+        #             child["href"]
+        #         ]
+        #     )
+        #     print(self.pages)
+
+        # print (self.pages)
+        # print("paging box:\n", paging_box)
+        print("000000000000000000000")
+        for box in paging_box:
+            print (box)
+            print()
+            print()
+
+        print("000000000000000000000")
+        # search_prev_button = soup.find("a", {"class":"search_prev"})
+        # if search_prev_button:
+        #     self.search_pos_prev= search_prev_button[]
+        # search_next_button = soup.find("a", {"class":"search_next"})
+
+        # self.base_url = base_url
+        # self.gallery_id = gallery_id
+        # self.s_type = "search_subject_memo"
+        # self.s_keyword = s_keyword
+        # self.page = 1
+        # self.search_pos = ""
