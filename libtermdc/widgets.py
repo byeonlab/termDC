@@ -1,5 +1,6 @@
-from textual.widgets import Static, DataTable
+from textual.widgets import Static, DataTable, ListView
 from textual.app import ComposeResult, Widget
+from textual.binding import Binding
 
 ### Gallery List ###
 class GalleryList(DataTable):
@@ -128,3 +129,14 @@ class CommentAreaWidget(Widget):
         yield CommentAreaHeaderStatic(self.comment_data["header"])
         for comment in self.comment_data["comments"].values():
             yield CommentItemWidget(comment)
+
+
+class Paginator(ListView):
+    BINDINGS = [
+        Binding("left", "cursor_up", "Cursor Left", show=False),
+        Binding("right", "cursor_down", "Cursor Right", show=False),
+    ]
+
+    def __init__(self):
+        super().__init__()
+        self.styles.layout = "horizontal"

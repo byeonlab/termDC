@@ -96,3 +96,26 @@ GoPageModalScreen {
     content-align: center middle;
 }
 
+
+
+PostSearchResultScreen {
+    /* layout: horizontal; */
+}
+Paginator {
+    /* padding-top: 50; */
+    /* layout: horizontal; */
+    /* width: 10; */
+    /* width: auto;     */
+    height: 1;
+    /* height: 4; */
+    /* overflow-y: scroll;  */
+}
+
+Label {
+    /* padding: 1 1; */
+}
+ListItem {
+    /* padding: 1 2; */
+    width: 10;
+}
+  

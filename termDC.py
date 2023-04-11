@@ -5,14 +5,64 @@ pkg_resources.require("textual==0.19.0")
 
 # Textual libraries
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Label, Input, Button
-from textual.containers import Grid, Vertical, Container
+from textual.widgets import Header, Footer, Label, Input, Button, ListView, ListItem, Button
+from textual.containers import Grid, Vertical, Container, Horizontal
 from textual.screen import Screen, ModalScreen
 from textual.binding import Binding
 
 # termDC libraries
-from libtermdc.widgets import GalleryList, PostListHeader, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget
+from libtermdc.widgets import GalleryList, PostListHeader, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget, Paginator
 from dcsdk.libdc import Gallery, MinorGallery, Post, MinorPost, PostSearchResult
+
+class PostSearchResultScreen(Screen):
+    BINDINGS = [
+        ("q", "pop_screen", "Quit"),
+        # ("n", "next_page", "Next Page"),
+        # ("p", "prev_page", "Previous Page"),
+        # ("g", "go_page", "Go Page"),
+        # ("s", "search", "Search"),
+        # ("r", "refresh", "Refresh"),
+    ]
+    def __init__(self, search_data):
+        super().__init__()
+        self.search_result = PostSearchResult(search_data["base_url"], search_data["gallery_id"], search_data["s_type"], search_data["s_keyword"])
+        self.post_list = PostList()
+        self.paginator = Paginator()
+        # self.paginator.BINDINGS = [
+        # Binding("left", "cursor_up", "Cursor Left", show=False),
+        # Binding("right", "cursor_down", "Cursor Right", show=False),
+    # ]
+        # self.paginator = Paginator()
+
+    def compose(self) -> ComposeResult:
+        yield self.post_list
+        yield self.paginator
+        # yield self.paginator
+    
+    def on_mount(self) -> None:
+        self.populate_list()
+
+
+
+    """Populates post list with current page"""
+    def populate_list(self) -> None:
+        data = self.search_result.data()
+        self.posts = data["posts"]
+        self.pages = data["pages"]
+        print(self.pages)
+        rows = iter(self.posts)
+        self.post_list.clear()
+        self.post_list.add_rows(rows)        
+
+        for page in self.pages:
+            self.paginator.append(ListItem(Label(page)))
+
+        # self.paginator.append(ListItem(Label("One")))
+        # self.paginator.append(ListItem(Label("Two")))
+        # self.paginator.append(ListItem(Label("Three")))
+        # self.paginator.append(ListItem(Label("Four")))
+
+    
 
 class PostSearchModalScreen(ModalScreen):
     """ModalScreen for post search"""
@@ -36,7 +86,17 @@ class PostSearchModalScreen(ModalScreen):
             gallery_id = parent_screen.gallery.id
             s_type = "search_subject_memo"
             s_keyword = self.query_one(Input).value
-            res = PostSearchResult(base_url, gallery_id, s_type, s_keyword)
+            # res = PostSearchResult(base_url, gallery_id, s_type, s_keyword)
+            # data = res.data()
+            # print(data)
+
+            search_data = {
+                "base_url": base_url,
+                "gallery_id": gallery_id,
+                "s_type": s_type,
+                "s_keyword": s_keyword
+            }
+            self.app.switch_screen(PostSearchResultScreen(search_data))
             # keyword = int(self.query_one(Input).value)
             # parent_screen = self.app.screen_stack[-2]
             # parent_screen.gallery.set_page(new_page)

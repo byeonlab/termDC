@@ -192,53 +192,60 @@ class MinorPost(Post):
 
 
 class PostSearchResult:
-    pages = []
-
     def __init__(self, base_url: str, gallery_id: str, s_type: str, s_keyword: str):
         # https://gall.dcinside.com/board/lists/?id=programming&page=1&search_pos=-2387776&s_type=search_subject_memo&s_keyword=.EA.B8.88.EC.9C.B5
-        "https://gall.dcinside.com/board/lists?id=programming&s_type=search_subject_memo&s_keyword=.EA.B8.88.EC.9C.B5"
-        response = requests.get(
-            url=base_url, 
+        self.base_url = base_url
+        self.gallery_id = gallery_id
+        self.s_type = s_type
+        self.s_keyword = urllib.parse.quote(s_keyword)
+        self.request_url = f"{self.base_url}?id={self.gallery_id}&s_type={s_type}&s_keyword={self.s_keyword}"
+
+    def data(self):
+        self.response = requests.get(
+            url=self.request_url, 
             headers=HEADERS,
-            params={
-                "id": gallery_id,
-                "s_type": s_type,
-                "s_keyword": urllib.parse.quote(s_keyword)
-            }
         )
-        
-        print(response.url)
-        soup = bs4.BeautifulSoup(response.text, "html.parser")
-        
-        paging_box = soup.find_all("div", {"class": "bottom_paging_box iconpaging"})
     
+        posts = []
+
+        soup = bs4.BeautifulSoup(self.response.text, "html.parser")
+        trs = soup.find_all("tr", {"class": "ub-content us-post"})
+
+        for tr in trs:
+            # title
+            title = tr.find("td", {"class": "gall_tit"}).find("a").get_text()
+            if tr.find("span", {"class": "reply_num"}):
+                title += tr.find("span", {"class": "reply_num"}).get_text()
+
+            # num
+            num = tr.find("td", {"class": "gall_num"}).get_text()
+
+            # writer
+            writer_data = tr.find("td", {"class": "gall_writer ub-writer"})
+            ip = writer_data["data-ip"]
+            nick = writer_data["data-nick"]
+            writer = nick
+            if ip:
+                writer += f"({ip})" 
+
+            # date
+            date = tr.find("td", {"class": "gall_date"}).get_text()
+
+            posts.append((num, writer, title, date))
         
-        # for child in paging_box.find_all():
-        #     self.pages.append(
-        #         [
-        #             child.get_text(),
-        #             child["href"]
-        #         ]
-        #     )
-        #     print(self.pages)
+        pages = {}
 
-        # print (self.pages)
-        # print("paging box:\n", paging_box)
-        print("000000000000000000000")
-        for box in paging_box:
-            print (box)
-            print()
-            print()
+        soup = bs4.BeautifulSoup(self.response.text, "html.parser")
+        paging_box = soup.find_all("div", {"class": "bottom_paging_box iconpaging"})[1]
 
-        print("000000000000000000000")
-        # search_prev_button = soup.find("a", {"class":"search_prev"})
-        # if search_prev_button:
-        #     self.search_pos_prev= search_prev_button[]
-        # search_next_button = soup.find("a", {"class":"search_next"})
+        for element in paging_box.find_all(recursive=False):
+            print(element)
+            if element.name == "em":
+                pages[element.get_text()] = "None"
+            if element.name == "a":
+                pages[element.get_text()] = element["href"]
+            
+        return {"posts": posts, "pages": pages}
 
-        # self.base_url = base_url
-        # self.gallery_id = gallery_id
-        # self.s_type = "search_subject_memo"
-        # self.s_keyword = s_keyword
-        # self.page = 1
-        # self.search_pos = ""
+    def page_move(self, uri):
+        self.request_url = self.base_url + uri[1:]
