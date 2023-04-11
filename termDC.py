@@ -6,7 +6,7 @@ pkg_resources.require("textual==0.19.0")
 # Textual libraries
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Label, Input, Button
-from textual.containers import Grid, Vertical
+from textual.containers import Grid, Vertical, Container
 from textual.screen import Screen, ModalScreen
 from textual.binding import Binding
 
@@ -122,9 +122,9 @@ class PostListScreen(Screen):
 
     """Renders table for post list and app footer"""
     def compose(self) -> ComposeResult:
+        yield self.post_list_header
         yield (
-            Vertical(
-                self.post_list_header,
+            Container(
                 self.post_list,
                 id="post_list_container"
             )

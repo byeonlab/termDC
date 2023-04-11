@@ -1,15 +1,20 @@
 PostListHeader {
-    height: 1;
+    height: auto;
     color: yellow;
     /* background: yellow; */
     /* text-style: bold; */
 }
 
 #post_list_container {
+    /* margin:; */
+    /* height: 60; */
 }
 PostListScreen {
+    /* height: auto; */
+    /* height: 100%; */
 }
 PostList {
+    /* height: auto; */
 }
 
 PostTitleStatic {
