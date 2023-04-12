@@ -116,6 +116,9 @@ Label {
 }
 ListItem {
     /* padding: 1 2; */
-    width: 10;
+    padding: 0 1 0 1;
+    margin: 0 1 0 1;
+    /* border: black; */
+    width: auto;
 }
   
