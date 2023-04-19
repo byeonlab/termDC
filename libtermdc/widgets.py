@@ -1,4 +1,4 @@
-from textual.widgets import Static, DataTable, ListView
+from textual.widgets import Static, DataTable, ListView, ListItem
 from textual.app import ComposeResult, Widget
 from textual.binding import Binding
 
@@ -140,3 +140,9 @@ class Paginator(ListView):
     def __init__(self):
         super().__init__()
         self.styles.layout = "horizontal"
+
+class PageItem(ListItem):
+    def __init__(self, widget, text, value):
+        super().__init__(widget)
+        self.text = text
+        self.value = value

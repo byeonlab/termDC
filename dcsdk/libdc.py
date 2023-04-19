@@ -198,11 +198,12 @@ class PostSearchResult:
         self.gallery_id = gallery_id
         self.s_type = s_type
         self.s_keyword = urllib.parse.quote(s_keyword)
-        self.request_url = f"{self.base_url}?id={self.gallery_id}&s_type={s_type}&s_keyword={self.s_keyword}"
+        self.base_url = base_url
+        self.request_uri = f"?id={self.gallery_id}&s_type={s_type}&s_keyword={self.s_keyword}"
 
     def data(self):
         self.response = requests.get(
-            url=self.request_url, 
+            url=f"{self.base_url}{self.request_uri}", 
             headers=HEADERS,
         )
     

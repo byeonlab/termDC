@@ -11,7 +11,7 @@ from textual.screen import Screen, ModalScreen
 from textual.binding import Binding
 
 # termDC libraries
-from libtermdc.widgets import GalleryList, PostListHeader, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget, Paginator
+from libtermdc.widgets import GalleryList, PostListHeader, PostList, PostHeaderWidget, PostBodyWidget, CommentAreaWidget, Paginator, PageItem
 from dcsdk.libdc import Gallery, MinorGallery, Post, MinorPost, PostSearchResult
 
 class PostSearchResultScreen(Screen):
@@ -22,9 +22,11 @@ class PostSearchResultScreen(Screen):
         # ("g", "go_page", "Go Page"),
         # ("s", "search", "Search"),
         # ("r", "refresh", "Refresh"),
-    ]
+    ] 
     def __init__(self, search_data):
         super().__init__()
+        self.gallery_type = search_data["gallery_type"]
+        self.gallery_id = search_data["gallery_id"]
         self.search_result = PostSearchResult(search_data["base_url"], search_data["gallery_id"], search_data["s_type"], search_data["s_keyword"])
         self.post_list = PostList()
         self.paginator = Paginator()
@@ -37,12 +39,12 @@ class PostSearchResultScreen(Screen):
     def compose(self) -> ComposeResult:
         yield self.post_list
         yield self.paginator
+
         # yield self.paginator
     
     def on_mount(self) -> None:
         self.populate_list()
-
-
+        self.post_list.focus()
 
     """Populates post list with current page"""
     def populate_list(self) -> None:
@@ -54,14 +56,21 @@ class PostSearchResultScreen(Screen):
         self.post_list.clear()
         self.post_list.add_rows(rows)        
 
+        self.paginator.clear()
         for page in self.pages:
-            self.paginator.append(ListItem(Label(page)))
+            self.paginator.append(PageItem(Label(page), page, self.pages[page]))
 
-        # self.paginator.append(ListItem(Label("One")))
-        # self.paginator.append(ListItem(Label("Two")))
-        # self.paginator.append(ListItem(Label("Three")))
-        # self.paginator.append(ListItem(Label("Four")))
+    def on_data_table_row_selected(self, event) -> None:
+        post_no = self.post_list.get_row_at(event.cursor_row)[0]
+        self.app.push_screen(PostReadScreen(self.gallery_id, self.gallery_type, post_no))
 
+    def on_list_view_selected(self, event) -> None:
+        # print(event.list_view)
+        # print(event.item.value)
+        self.search_result.base_url = "https://gall.dcinside.com/"
+        self.search_result.request_uri = event.item.value
+        print(self.search_result.base_url + self.search_result.request_uri[1:])
+        self.populate_list()
     
 
 class PostSearchModalScreen(ModalScreen):
@@ -84,6 +93,7 @@ class PostSearchModalScreen(ModalScreen):
             parent_screen = self.app.screen_stack[-2]
             base_url = parent_screen.gallery.BASE_URL
             gallery_id = parent_screen.gallery.id
+            gallery_type = parent_screen.gallery.TYPE
             s_type = "search_subject_memo"
             s_keyword = self.query_one(Input).value
             # res = PostSearchResult(base_url, gallery_id, s_type, s_keyword)
@@ -93,6 +103,7 @@ class PostSearchModalScreen(ModalScreen):
             search_data = {
                 "base_url": base_url,
                 "gallery_id": gallery_id,
+                "gallery_type": gallery_type,
                 "s_type": s_type,
                 "s_keyword": s_keyword
             }
